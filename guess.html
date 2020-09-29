@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>猜数字游戏</title>
+    <style>
+      body {
+        padding: 100px 0;
+        background-color: #6ac8f0;
+        color: rgb(121, 69, 69);
+        text-align: center;
+        font-size: 1.5em;
+      }
+
+      input {
+        padding: 5px 20px;
+        height: 50px;
+        background-color: #b5bcc2;
+        border: 1px solid #c0c0c0;
+        box-sizing: border‐box;
+        color: #fff;
+        font-size: 20px;
+      }
+
+      button {
+        padding: 5px 20px;
+        height: 50px;
+        font-size: 16px;
+      }
+
+      div {
+        width: 800px;
+        height: 50px;
+        margin: 0 auto;
+      }
+    </style>
+
+    <script>
+      // 加载页面
+      window.onload = function () {
+        // 定义随机数函数
+        function getRandom(min, max) {
+          return parseInt(Math.random() * (max - min) + min);
+        }
+
+        // 获取 DOM 对象
+        var num = document.getElementById("num");
+        var start = document.getElementById("start");
+        var show = document.getElementById("show");
+        var preNum = document.getElementById("preNum");
+        var restart = document.getElementById("restart");
+
+        // 定义游戏函数
+        function game() {
+          // 通过 flag 记录点击次数
+          var flag = 0;
+
+          // 创建随机数对象
+          var ran = getRandom(0, 100);
+
+          // 按钮注册点击事件
+          start.onclick = function () {
+            // 获取用户输入的值
+            var val = num.value;
+
+            // 显示提示框
+            show.style.display = "block";
+            // 判断用户输入的值
+            if (val > 0 && val < 100) {
+              flag += 1;
+              var showResult = preNum.innerText;
+              preNum.innerText = showResult ? showResult + "，" + val : val;
+
+              // 判断用户输入的数字和产生的随机数
+              if (val < ran) {
+                show.innerText = "小了点啊";
+                show.style.backgroundColor = "red";
+              } else if (val > ran) {
+                show.innerText = "大了点啊";
+                show.style.backgroundColor = "red";
+              } else {
+                show.innerText = "恭喜你！猜对了！";
+                show.style.backgroundColor = "green";
+                // 猜对了之后，按钮不允许点击，数字框不允许输入，除非重新开始
+                this.disabled = "disabled";
+                num.disabled = "disabled";
+              }
+            } else {
+              show.innerText = "请输入0 - 100之间的数字";
+              show.style.backgroundColor = "red";
+            }
+          };
+        }
+
+        game();
+
+        // 重新开始游戏
+        restart.onclick = function () {
+          // 允许按钮点击
+          start.removeAttribute("disabled");
+          // 允许数字框输入
+          num.removeAttribute("disabled");
+          // 隐藏提示框
+          show.style.display = "none";
+          // 清空
+          preNum.innerText = "";
+          // 初始化数字框
+          num.value = "";
+          // 再次调用
+          game();
+        };
+      };
+    </script>
+  </head>
+  <body>
+    <h1>猜数字游戏</h1>
+    <p>
+      我心里想了一个0~100的数字,<br />
+      你来猜猜看我想的到底是几?<br />
+      我会告诉你当前你猜的数字是大还是小<br />
+      请尝试使用最少次数 来猜出我想的数字
+    </p>
+    <input type="number" min="0" max="100" name="num" id="num" />
+    <button id="start">试一试</button><br />
+    <p>猜过的数字: <span id="preNum"></span></p>
+    <div id="show" style="display: none"></div>
+    <button id="restart">重新开始</button>
+  </body>
+</html>
