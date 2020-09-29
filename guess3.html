@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>猜数字游戏</title>
+    <style>
+      body {
+        padding: 100px 0;
+        background-color: #6ac8f0;
+        color: rgb(121, 69, 69);
+        text-align: center;
+        font-size: 1.5em;
+      }
+
+      input {
+        padding: 5px 20px;
+        height: 50px;
+        background-color: #b5bcc2;
+        border: 1px solid #c0c0c0;
+        box-sizing: border‐box;
+        color: #fff;
+        font-size: 20px;
+      }
+
+      button {
+        padding: 5px 20px;
+        height: 50px;
+        font-size: 16px;
+      }
+
+      div {
+        width: 800px;
+        height: 50px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      //加载页面
+      window.onload = game;
+      //处理历史事件
+      window.onpopstate = popState;
+      //定义全局变量，状态和显示
+      var state, show;
+
+      function game(agin) {
+        show = {
+          heading: null,
+          prompt: null, //用于提示用户输入正确的数字
+          input: null, //用户输入猜测数字的地方
+          low: null,
+          mid: null,
+          high: null,
+        };
+
+        //查询这些元素中每个元素的id
+        for (var id in show) show[id] = document.getElementById(id);
+
+        //定义一个函数来处理input字段
+        show.input.onchange = handleGuess;
+
+        //生成一个随机数字并初始化游戏状态
+        state = {
+          n: Math.floor(99 * Math.random()) + 1,
+          low: 0, //可猜测数字范围的下限
+          high: 100, //可猜测数字范围的上限
+          sum: 0, //猜测次数
+          guess: undefined, //最后一次猜测
+        };
+
+        //显示网页初始状态
+        display(state);
+        if (agin == true) save(state);
+      }
+
+      //用pushState（）方法将游戏状态保存到浏览器历史记录中
+      function save(state) {
+        if (!history.pushState) return; //如果pushState（）方法没有定义的话，则什么也不做
+
+        var url = "#guess" + state.sum;
+        //保存状态对象和URL
+        history.pushState(
+          state,
+          "", //状态标题
+          url //状态URL
+        );
+      }
+      function popState(event) {
+        //恢复历史状态并显示
+        if (event.state) {
+          state = event.state;
+          display(state);
+        }
+      }
+
+      //更新、保存并显示游戏的进度
+      function handleGuess() {
+        //从input字段中获取用户猜测的数字
+        var g = parseInt(this.value);
+        //如果该值是限定范围中的一个数字
+        if (g > state.low && g < state.high) {
+          //对应的更新状态对象
+          if (g < state.n) state.low = g;
+          else if (g > state.n) state.high = g;
+          state.guess = g;
+          state.sum++;
+          //在浏览器历史记录中保存新的状态
+          save(state);
+          //根据用户猜测情况来修改网页
+          display(state);
+        } else {
+          //提高用户猜测效率
+          alert(
+            "请输入一个比" + state.low + "，并且比" + state.high + "大的数。"
+          );
+        }
+      }
+
+      function display(state) {
+        show.heading.innerHTML = document.title =
+          "这个数字在" + state.low + "~" + state.high + "之间。";
+
+        //使用表格来显示数字的取值范围
+        show.low.style.width = state.low + "%";
+        show.mid.style.width = state.high - state.low + "%";
+        show.high.style.width = 100 - state.high + "%";
+
+        //根据用户最近的猜测，设置提示
+        if (state.guess === undefined)
+          show.prompt.innerHTML = "输入错误！请重试！";
+        else if (state.guess < state.n)
+          show.prompt.innerHTML = state.guess + "太小了，请重新输入：";
+        else if (state.guess > state.n)
+          show.prompt.innerHTML = state.guess + "太大了，请重新输入：";
+        else {
+          //成功以后，显示“再玩一次”按钮
+          show.heading.innerHTML = document.title = state.guess + "成功啦！";
+          show.prompt.innerHTML =
+            "成功啦！<button onclick='game(true)'>再玩一次</button>";
+        }
+      }
+    </script>
+    <style type="text/css">
+      #prompt {
+        font-size: 20pt;
+      }
+      table {
+        width: 80%;
+        margin: 20px;
+        margin-left: 10%;
+      }
+      #low,
+      #high {
+        background: rgb(49, 38, 38);
+        height: 1.5em;
+      }
+      #mid {
+        background-color: green;
+      }
+    </style>
+    <h1 id="heading">猜数字游戏</h1>
+    <table>
+      <tr>
+        <td id="low"></td>
+        <td id="mid"></td>
+        <td id="high"></td>
+      </tr>
+    </table>
+    <label id="prompt"></label><input type="text" id="input" />
+    <button id="start">试一试</button><br />
+  </body>
+</html>
